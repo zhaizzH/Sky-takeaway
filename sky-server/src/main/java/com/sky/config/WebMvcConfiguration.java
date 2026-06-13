@@ -75,6 +75,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         log.info("开始配置静态资源映射...");
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/static/**").addResourceLocations("file:C:/Users/zzz/web/sky/frontend/nginx-1.20.2/html/sky/img/upload/");
     }
 
     /**
