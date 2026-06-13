@@ -12,7 +12,6 @@ public interface  SetmealMapper {
      * @return
      */
 
-    // TODO 疑似id要改为categoryId
     @Select("select count(id) from setmeal where category_id = #{categoryId}")
     Integer countByCategoryId(Long id);
 
