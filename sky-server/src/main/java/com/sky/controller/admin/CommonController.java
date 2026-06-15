@@ -13,6 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+/**
+ * 通用接口
+ */
 @RestController
 @RequestMapping("/admin/common")
 @Api(tags = "通用接口")

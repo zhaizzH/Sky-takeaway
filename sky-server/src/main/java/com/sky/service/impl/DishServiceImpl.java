@@ -37,7 +37,7 @@ public class DishServiceImpl implements DishService {
     /**
      * 新增菜品和口味
      *
-     * @param dishDTO
+     * @param dishDTO 菜品DTO 菜品实体类
      */
     @Transactional
     @Override
@@ -65,8 +65,8 @@ public class DishServiceImpl implements DishService {
     /**
      * 分页查询菜品
      *
-     * @param dishPageQueryDTO
-     * @return
+     * @param dishPageQueryDTO 分页查询菜品DTO
+     * @return 分页查询结果VO列表
      */
     @Override
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
@@ -79,7 +79,7 @@ public class DishServiceImpl implements DishService {
     /**
      * 菜品批量删除
      *
-     * @param ids
+     * @param ids 菜品ID集合
      */
     @Override
     @Transactional  // 多表操作，需要开启事务
@@ -118,8 +118,9 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根据菜品id查询菜品详情
-     * @param id
-     * @return
+     *
+     * @param id 菜品ID
+     * @return 菜品详情VO 菜品实体类
      */
     @Override
     public DishVO getByIdWithFlavor(Long id) {
@@ -136,7 +137,8 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 更新菜品和口味
-     * @param dishDTO
+     *
+     * @param dishDTO 菜品DTO 菜品实体类
      */
     @Override
     public void updateWithFlavor(DishDTO dishDTO) {
@@ -156,5 +158,26 @@ public class DishServiceImpl implements DishService {
             // 批量新增口味数据
             dishFlavorMapper.insertBatch(flavors);
         }
+    }
+
+    @Override
+    public void startOrStop(Long id, Integer status) {
+        Dish dish = Dish.builder()
+                .id(id)
+                .status(status)
+                .build();
+        dishMapper.update(dish);
+    }
+
+    /**
+     * 根据分类id查询菜品
+     *
+     * @param categoryId 分类id
+     * @return 菜品列表
+     */
+    @Override
+    public List<Dish> listByCategoryId(Integer categoryId) {
+        // 遍历分类id查询菜品数据
+        return dishMapper.getByCategoryId(categoryId);
     }
 }

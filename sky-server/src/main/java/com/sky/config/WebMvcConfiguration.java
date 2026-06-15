@@ -36,7 +36,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     /**
      * 注册自定义拦截器
      *
-     * @param registry
+     * @param registry 拦截器注册器
      */
     protected void addInterceptors(InterceptorRegistry registry) {
         log.info("开始注册自定义拦截器...");
@@ -48,20 +48,43 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     /**
      * 通过knife4j生成接口文档
      *
-     * @return
+     * @return Docket对象
      */
     @Bean
-    public Docket docket() {
-        log.info("准备生成接口文档...");
+    public Docket docketAdmin() {
+        log.info("准备生成管理员端接口文档...");
         ApiInfo apiInfo = new ApiInfoBuilder()
                 .title("苍穹外卖项目接口文档")
                 .version("2.0")
                 .description("苍穹外卖项目接口文档")
                 .build();
         return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("管理员端接口")
                 .apiInfo(apiInfo)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.sky.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.admin"))
+                .paths(PathSelectors.any())
+                .build();
+    }
+
+    /**
+     * 通过knife4j生成接口文档
+     *
+     * @return Docket对象
+     */
+    @Bean
+    public Docket docketUser() {
+        log.info("准备生成用户端接口文档...");
+        ApiInfo apiInfo = new ApiInfoBuilder()
+                .title("苍穹外卖项目接口文档")
+                .version("2.0")
+                .description("苍穹外卖项目接口文档")
+                .build();
+        return new Docket(DocumentationType.SWAGGER_2)
+                .groupName("用户端接口")
+                .apiInfo(apiInfo)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("com.sky.controller.user"))
                 .paths(PathSelectors.any())
                 .build();
     }
@@ -81,7 +104,7 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     /**
      * 注册自定义消息格式转换器,时间格式转化为选定格式
      *
-     * @param converters
+     * @param converters 消息转换器列表
      */
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         log.info("注册自定义消息格式转换器...");
