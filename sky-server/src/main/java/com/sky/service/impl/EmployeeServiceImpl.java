@@ -31,8 +31,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     /**
      * 员工登录
      *
-     * @param employeeLoginDTO
-     * @return
+     * @param employeeLoginDTO 员工登录DTO 员工实体类
+     * @return 员工实体类
      */
     public Employee login(EmployeeLoginDTO employeeLoginDTO) {
         String username = employeeLoginDTO.getUsername();
@@ -56,7 +56,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
 
-        if (employee.getStatus() == StatusConstant.DISABLE) {
+        if (employee.getStatus().equals(StatusConstant.DISABLE)) {
             //账号被锁定
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
@@ -67,7 +67,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 新增员工
-     * @param employeeDTO
+     * @param employeeDTO 员工DTO 员工实体类
      */
     @Override
     public void save(EmployeeDTO employeeDTO) {
@@ -97,8 +97,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 员工分页查询
-     * @param employeePageQueryDTO
-     * @return
+     * @param employeePageQueryDTO 分页查询员工DTO
+     * @return 分页查询结果VO列表
      */
     @Override
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
@@ -114,8 +114,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 启用/停用员工
-     * @param status
-     * @param id
+     * @param status 状态 1：启用 0：停用
+     * @param id 员工ID
      */
     @Override
     public void startOrStop(Integer status, Long id) {
@@ -129,8 +129,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 根据ID查询员工信息
-     * @param id
-     * @return
+     * @param id 员工ID
+     * @return 员工实体类
      */
     @Override
     public Employee getById(Long id) {
@@ -141,7 +141,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 更新员工数据
-     * @param employeeDTO
+     * @param employeeDTO 员工DTO 员工实体类
      */
     @Override
     public void update(EmployeeDTO employeeDTO) {
