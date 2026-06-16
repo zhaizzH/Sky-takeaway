@@ -71,5 +71,5 @@ public interface DishMapper {
      * @return 菜品列表
      */
     @Select("select * from dish where category_id=#{categoryId} and status=#{status}")
-       List<Dish> list(Dish dish);
+    List<Dish> list(Dish dish);
 }
