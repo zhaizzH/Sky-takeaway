@@ -27,28 +27,29 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     /**
      * 添加购物车
+     *
      * @param shoppingCartDTO 购物车数据DTO
      */
     @Override
     public void addShoppingCart(ShoppingCartDTO shoppingCartDTO) {
         // 判断当前商品是否再购物车中存在
-        ShoppingCart shoppingCart =new ShoppingCart();
-        BeanUtils.copyProperties(shoppingCartDTO,shoppingCart);
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
         Long userId = BaseContext.getCurrentId();
         shoppingCart.setUserId(userId);
 
         List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
         // 存在，只需要将商品数量加一
-        if(list!=null&&!list.isEmpty()){
+        if (list != null && !list.isEmpty()) {
             shoppingCart = list.get(0);
-            shoppingCart.setNumber(shoppingCart.getNumber()+1);
+            shoppingCart.setNumber(shoppingCart.getNumber() + 1);
             shoppingCartMapper.updateNumber(shoppingCart);
-        }else{
+        } else {
             // 不存在，需要新增商品到购物车
 
             // 判断本次添加到购物车的是菜品还是套餐
             Long dishId = shoppingCartDTO.getDishId();
-            if(dishId!=null){
+            if (dishId != null) {
                 // 菜品
                 Dish dish = dishMapper.getById(dishId);
 
@@ -56,7 +57,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 shoppingCart.setName(dish.getName());
                 shoppingCart.setImage(dish.getImage());
                 shoppingCart.setAmount(dish.getPrice());
-            }else{
+            } else {
                 // 套餐
                 Long setmealId = shoppingCart.getSetmealId();
 
@@ -71,5 +72,17 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCartMapper.insert(shoppingCart);
         }
 
+    }
+
+    /**
+     * 查询购物车列表
+     *
+     * @return 购物车列表
+     */
+    @Override
+    public List<ShoppingCart> list() {
+        Long userId = BaseContext.getCurrentId();
+        ShoppingCart shoppingCart = ShoppingCart.builder().userId(userId).build();
+        return shoppingCartMapper.list(shoppingCart);
     }
 }
