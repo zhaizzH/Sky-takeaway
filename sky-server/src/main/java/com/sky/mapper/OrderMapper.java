@@ -28,12 +28,12 @@ public interface OrderMapper {
     void update(Orders orders);
 
     /**
-     * 分页条件查询用户订单历史
+     * 用户分页条件查询用户订单历史
      * @param ordersPageQueryDTO 查询参数实体类
      * @return 订单历史列表
      */
     @Select("select * from orders where user_id = #{userId} order by order_time desc")
-    Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
+    Page<Orders> pageQueryUser(OrdersPageQueryDTO ordersPageQueryDTO);
 
     /**
      * 根据订单id查询订单
@@ -42,4 +42,18 @@ public interface OrderMapper {
      */
     @Select("select * from orders where id = #{id}")
     Orders getById(Long id);
+
+    /**
+     * 管理员分页条件查询订单列表
+     * @param ordersPageQueryDTO 查询参数实体类
+     * @return 订单列表
+     */
+    Page<Orders> pageQueryAdmin(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 统计订单状态数量
+     * @param toBeConfirmed 订单状态
+     * @return 订单状态数量
+     */
+    Integer countByStatus(Integer toBeConfirmed);
 }

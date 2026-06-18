@@ -5,9 +5,7 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
@@ -17,6 +15,7 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
@@ -170,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
 
         // 分页条件查询
-        try (Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO)) {
+        try (Page<Orders> page = orderMapper.pageQueryUser(ordersPageQueryDTO)) {
 
             List<OrderVO> list = new ArrayList<>();
 
@@ -219,7 +218,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id 订单id
      */
     @Override
-    public void cancelOrder(Long id) {
+    public void cancelOrderUser(Long id) {
         // 根据id修改订单状态
         Orders orders = Orders.builder()
                 .id(id)
@@ -258,5 +257,133 @@ public class OrderServiceImpl implements OrderService {
 
         //向订单明细表插入n条数据
         orderDetailMapper.insertBatch(orderDetailList);
+    }
+
+    @Override
+    public PageResult pageQueryAdmin(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        try (Page<Orders> page = orderMapper.pageQueryAdmin(ordersPageQueryDTO)) {
+            return new PageResult(page.getTotal(), page.getResult());
+        }
+    }
+
+    /**
+     * 订单统计接口
+     * @return 订单统计结果
+     */
+    @Override
+    public OrderStatisticsVO getOrderStatistics() {
+        // 统计： 2待接单 3已接单 4派送中
+        // 统计待接单数量
+        Integer toBeConfirmed = orderMapper.countByStatus(Orders.TO_BE_CONFIRMED);
+
+        // 统计已接单数量
+        Integer confirmed = orderMapper.countByStatus(Orders.CONFIRMED);
+
+        // 统计派送中数量
+        Integer deliveryInProgress = orderMapper.countByStatus(Orders.DELIVERY_IN_PROGRESS );
+
+        // 封装vo返回结果
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        orderStatisticsVO.setToBeConfirmed(toBeConfirmed);
+        orderStatisticsVO.setConfirmed(confirmed);
+        orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
+
+        return orderStatisticsVO;
+    }
+
+    /**
+     * 订单详情接口
+     * @param id 订单id
+     * @return 订单详情
+     */
+    @Override
+    public OrderVO getById(Long id) {
+        // 根据订单id查询订单
+        Orders orders = orderMapper.getById(id);
+
+        // 查询订单明细
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
+
+        // 封装vo返回结果
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(orders, orderVO);
+        orderVO.setOrderDetailList(orderDetails);
+
+        return orderVO;
+    }
+
+    /**
+     * 接单接口
+     * @param ordersConfirmDTO 订单确认实体类
+     */
+    @Override
+    public void confirmOrder(OrdersConfirmDTO ordersConfirmDTO) {
+        // 根据id修改订单状态
+        Orders orders = Orders.builder()
+                .id(ordersConfirmDTO.getId())
+                .status(Orders.CONFIRMED)
+                .build();
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 拒单接口
+     * @param ordersRejectionDTO 订单拒绝实体类
+     */
+    @Override
+    public void rejectionOrder(OrdersRejectionDTO ordersRejectionDTO) {
+        // 根据id修改订单状态
+        Orders orders = Orders.builder()
+                .id(ordersRejectionDTO.getId())
+                .status(Orders.CANCELLED)
+                .rejectionReason(ordersRejectionDTO.getRejectionReason())
+                .build();
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 取消订单接口
+     * @param ordersCancelDTO 订单取消实体类
+     */
+    @Override
+    public void cancelOrderAdmin(OrdersCancelDTO ordersCancelDTO) {
+        // 根据id修改订单状态
+        Orders orders = Orders.builder()
+                .id(ordersCancelDTO.getId())
+                .status(Orders.CANCELLED)
+                .cancelReason(ordersCancelDTO.getCancelReason())
+                .cancelTime(LocalDateTime.now())
+                .build();
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 配送订单接口
+     * @param id 订单id
+     */
+    @Override
+    public void deliveryOrder(Long id) {
+        // 根据id修改订单状态
+        Orders orders = Orders.builder()
+                .id(id)
+                .status(Orders.DELIVERY_IN_PROGRESS)
+                .build();
+        orderMapper.update(orders);
+    }
+
+    /**
+     * 完成订单接口
+     *
+     * @param id 订单id
+     */
+    @Override
+    public void completeOrder(Long id) {
+        // 根据id修改订单状态
+        Orders orders = Orders.builder()
+                .id(id)
+                .status(Orders.COMPLETED)
+                .build();
+        orderMapper.update(orders);
     }
 }
