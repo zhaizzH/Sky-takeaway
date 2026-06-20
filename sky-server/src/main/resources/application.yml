@@ -16,7 +16,6 @@ spring:
     host: ${sky.redis.host}
     port: ${sky.redis.port}
 
-
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
@@ -50,3 +49,5 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+  shop:
+    address: ${sky.shop.address}
