@@ -35,6 +35,5 @@ public interface UserMapper {
      * @param map 查询参数
      * @return 新用户数
      */
-    @Select("select count(*) from user where create_time between #{begin} and #{end}")
     Long countNewUserByMap(Map<String, Object> map);
 }
