@@ -1,6 +1,63 @@
+# === Java / Maven ===
 **/target/
-.idea
-*.iml
 *.class
-*Test.java
-**/test/
+*.jar
+*.war
+*.ear
+*.log
+*.tmp
+*.bak
+*.orig
+*.swp
+*.save
+
+# === IDE ===
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+
+# === OS ===
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+*.lnk
+
+# === Node / Frontend ===
+node_modules/
+dist/
+build/
+.cache/
+
+# === Nginx 编译产物 (frontend) ===
+frontend/nginx-1.20.2/objs/
+frontend/nginx-1.20.2/Makefile
+frontend/nginx-1.20.2/auto/configure
+
+# === Docs 中的二进制/安装包 ===
+*.zip
+*.tar.gz
+*.exe
+*.msi
+*.dmg
+*.iso
+
+# === Python ===
+__pycache__/
+*.pyc
+*.pyo
+.env
+venv/
+.venv/
+
+# === 其他 ===
+*.class
+.h2/
+.h2data/
