@@ -83,4 +83,11 @@ public interface OrderMapper {
      * @return 销售排名统计结果
      */
     List<GoodsSalesDTO> getSalesTop(LocalDateTime begin, LocalDateTime end);
+
+    /**
+     * 订单金额统计
+     * @param map 查询参数
+     * @return 订单金额
+     */
+    Double sumByMap(Map<String, Object> map);
 }
