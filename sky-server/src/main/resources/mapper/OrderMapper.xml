@@ -64,10 +64,12 @@
         order by order_time desc
     </select>
     <select id="countByStatus" resultType="java.lang.Integer">
-        select count(*) from orders where status = #{status}
+        select count(*)
+        from orders
+        where status = #{status}
     </select>
-    <select id="countTurnoverByMap" resultType="java.lang.Double">
-        select count(amount) from orders
+    <select id="countByMap" resultType="java.lang.Double">
+        select count(id) from orders
         <where>
             <if test="begin != null">
                 order_time &gt;= #{begin}
@@ -79,5 +81,19 @@
                 and status = #{status}
             </if>
         </where>
+    </select>
+    <select id="getSalesTop" resultType="com.sky.dto.GoodsSalesDTO">
+        select od.name,sum(od.number) as number
+        from order_detail od,orders o
+        where od.order_id=o.id and o.status =5
+        <if test="begin != null">
+            and o.order_time &gt; #{begin}
+        </if>
+        <if test="end != null">
+            and o.order_time &lt; #{end}
+        </if>
+        group by od.name
+        order by number desc
+        limit 0,10
     </select>
 </mapper>
