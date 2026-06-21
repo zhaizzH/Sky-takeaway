@@ -84,7 +84,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(userId);
-        orders.setAddress(addressBook.getProvinceName()+addressBook.getCityName()+addressBook.getDetail());
+        orders.setAddress(addressBook.getProvinceName() + addressBook.getCityName() + addressBook.getDetail());
 
         orderMapper.insert(orders);
 
@@ -115,6 +115,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 订单支付
+     *
      * @param ordersPaymentDTO 订单支付参数
      * @return 订单支付结果
      */
@@ -143,6 +144,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 支付成功，修改订单状态
+     *
      * @param outTradeNo 订单号
      */
     public void paySuccess(String outTradeNo) {
@@ -161,27 +163,28 @@ public class OrderServiceImpl implements OrderService {
         orderMapper.update(orders);
 
         // 通过websocket向客户端浏览器推送消息
-        Map<String,Object> map=new HashMap<>();
-        map.put("type",1);
-        map.put("orderId",orders.getId());
-        map.put("content","订单号: "+outTradeNo);
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 1);
+        map.put("orderId", orders.getId());
+        map.put("content", "订单号: " + outTradeNo);
 
         String json = JSONObject.toJSONString(map);
         webSocketServer.sendToAllClient(json);
-       }
+    }
 
 
     /**
      * 分页条件查询用户订单历史
+     *
      * @param ordersPageQueryDTO 查询参数
      * @return 订单历史列表
      */
     @Override
     public PageResult pageQueryUser(OrdersPageQueryDTO ordersPageQueryDTO) {
         // 设置分页
-       PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
 
-       ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
 
         // 分页条件查询
         try (Page<Orders> page = orderMapper.pageQueryUser(ordersPageQueryDTO)) {
@@ -209,6 +212,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 查询订单详情接口
+     *
      * @param id 订单id
      * @return 订单详情
      */
@@ -230,6 +234,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 取消订单
+     *
      * @param id 订单id
      */
     @Override
@@ -244,6 +249,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 再来一单
+     *
      * @param id 订单id
      */
     @Override
@@ -261,7 +267,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderDetail> orderDetailList = new ArrayList<>();
         // 根据id查询orderId，获取再来一单中所有商品明细
-        List<OrderDetail> historicalOrders =orderDetailMapper.getByOrderId(id);
+        List<OrderDetail> historicalOrders = orderDetailMapper.getByOrderId(id);
 
         for (OrderDetail list : historicalOrders) {
             OrderDetail orderDetail = new OrderDetail();//订单明细
@@ -284,6 +290,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 订单统计接口
+     *
      * @return 订单统计结果
      */
     @Override
@@ -296,7 +303,7 @@ public class OrderServiceImpl implements OrderService {
         Integer confirmed = orderMapper.countByStatus(Orders.CONFIRMED);
 
         // 统计派送中数量
-        Integer deliveryInProgress = orderMapper.countByStatus(Orders.DELIVERY_IN_PROGRESS );
+        Integer deliveryInProgress = orderMapper.countByStatus(Orders.DELIVERY_IN_PROGRESS);
 
         // 封装vo返回结果
         OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
@@ -309,6 +316,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 订单详情接口
+     *
      * @param id 订单id
      * @return 订单详情
      */
@@ -330,6 +338,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 接单接口
+     *
      * @param ordersConfirmDTO 订单确认实体类
      */
     @Override
@@ -344,6 +353,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 拒单接口
+     *
      * @param ordersRejectionDTO 订单拒绝实体类
      */
     @Override
@@ -359,6 +369,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 取消订单接口
+     *
      * @param ordersCancelDTO 订单取消实体类
      */
     @Override
@@ -375,6 +386,7 @@ public class OrderServiceImpl implements OrderService {
 
     /**
      * 配送订单接口
+     *
      * @param id 订单id
      */
     @Override
@@ -400,5 +412,27 @@ public class OrderServiceImpl implements OrderService {
                 .status(Orders.COMPLETED)
                 .build();
         orderMapper.update(orders);
+    }
+
+    /**
+     * 催单接口
+     *
+     * @param id 订单id
+     */
+    @Override
+    public void reminderOrder(Long id) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        // 通过websocket向客户端浏览器推送消息
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", 2);
+        map.put("orderId", id);
+        map.put("content", "订单号: " + ordersDB);
+
+        String json = JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 }

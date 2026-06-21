@@ -66,4 +66,18 @@
     <select id="countByStatus" resultType="java.lang.Integer">
         select count(*) from orders where status = #{status}
     </select>
+    <select id="countTurnoverByMap" resultType="java.lang.Double">
+        select count(amount) from orders
+        <where>
+            <if test="begin != null">
+                order_time &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                and order_time &lt;= #{end}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
 </mapper>
