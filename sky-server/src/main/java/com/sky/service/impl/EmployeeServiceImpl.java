@@ -5,12 +5,15 @@ import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
+import com.sky.exception.PasswordEditFailedException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
@@ -67,6 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 新增员工
+     *
      * @param employeeDTO 员工DTO 员工实体类
      */
     @Override
@@ -97,6 +101,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 员工分页查询
+     *
      * @param employeePageQueryDTO 分页查询员工DTO
      * @return 分页查询结果VO列表
      */
@@ -114,13 +119,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 启用/停用员工
+     *
      * @param status 状态 1：启用 0：停用
-     * @param id 员工ID
+     * @param id     员工ID
      */
     @Override
     public void startOrStop(Integer status, Long id) {
         // 使用构造器模式创建员工对象，设置状态和ID
-        Employee employee=Employee.builder()
+        Employee employee = Employee.builder()
                 .status(status)
                 .id(id)
                 .build();
@@ -129,6 +135,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 根据ID查询员工信息
+     *
      * @param id 员工ID
      * @return 员工实体类
      */
@@ -141,6 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 更新员工数据
+     *
      * @param employeeDTO 员工DTO 员工实体类
      */
     @Override
@@ -152,5 +160,24 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.update(employee);
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param passwordEditDTO 修改密码参数
+     */
+    @Override
+    public void editPassword(PasswordEditDTO passwordEditDTO) {
+        Employee employee = employeeMapper.getById(BaseContext.getCurrentId());
+        // 对前端传过来的明文密码进行d5加密处理
+        String oldPassword = DigestUtils.md5DigestAsHex(passwordEditDTO.getOldPassword().getBytes());
+        //比对密码
+        if (oldPassword.equals(employee.getPassword())) {
+            employee.setPassword(DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes()));
+            employeeMapper.update(employee);
+        } else {
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_EDIT_FAILED);
+        }
     }
 }

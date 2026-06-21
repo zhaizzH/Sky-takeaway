@@ -40,7 +40,7 @@ public class DishServiceImpl implements DishService {
      *
      * @param dishDTO 菜品DTO 菜品实体类
      */
-    @Transactional
+    @Transactional // 多表操作，需要开启事务
     @Override
     public void saveWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
